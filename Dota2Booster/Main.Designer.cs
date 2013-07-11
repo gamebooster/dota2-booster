@@ -1,4 +1,4 @@
-﻿namespace SimCitySpeedBooster {
+﻿namespace Dota2Booster {
   partial class Main {
     /// <summary>
     /// Required designer variable.

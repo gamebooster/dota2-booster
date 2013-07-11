@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using SimCitySpeedBooster.Properties;
+using Dota2Booster.Properties;
 
-namespace SimCitySpeedBooster {
+namespace Dota2Booster {
   public partial class Main : Form {
     private readonly ProcessMemory _processMemory = new ProcessMemory();
 
@@ -100,7 +100,7 @@ namespace SimCitySpeedBooster {
 
     private void Main_FormClosing(object sender, FormClosingEventArgs e) {
       Settings.Default.distance = (int) distanceUpDown.Value;
-      Settings.Default.fov = (int)fovUpDown.Value;
+      Settings.Default.fov = (int) fovUpDown.Value;
       Settings.Default.Save();
     }
   }

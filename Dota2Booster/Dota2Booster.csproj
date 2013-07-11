@@ -8,8 +8,8 @@
     <ProjectGuid>{7042BFF2-CF4A-4373-B281-A116EDBCC0FE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimCitySpeedBooster</RootNamespace>
-    <AssemblyName>SimCitySpeedBooster</AssemblyName>
+    <RootNamespace>Dota2Booster</RootNamespace>
+    <AssemblyName>Dota2Booster</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

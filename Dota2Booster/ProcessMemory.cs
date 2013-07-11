@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace SimCitySpeedBooster {
+namespace Dota2Booster {
   internal class ProcessMemory {
     [Flags]
     public enum AllocationType {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimCitySpeedBooster.Properties {
+namespace Dota2Booster.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SimCitySpeedBooster.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimCitySpeedBooster.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Dota2Booster.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -70,7 +70,7 @@ namespace SimCitySpeedBooster.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Searching SimCity....
+        ///   Looks up a localized string similar to Searching Dota 2....
         /// </summary>
         internal static string searching_Dota2 {
             get {
