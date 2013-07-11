@@ -5,10 +5,10 @@
   <Profiles />
   <Settings>
     <Setting Name="fov" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">61</Value>
     </Setting>
     <Setting Name="distance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1134</Value>
     </Setting>
   </Settings>
 </SettingsFile>
