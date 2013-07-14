@@ -71,7 +71,7 @@
       // 
       // checkTimer
       // 
-      this.checkTimer.Interval = 1000;
+      this.checkTimer.Interval = 200;
       this.checkTimer.Tick += new System.EventHandler(this.CheckTimerTick);
       // 
       // fovUpDown
@@ -110,7 +110,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(160, 113);
+      this.ClientSize = new System.Drawing.Size(160, 116);
       this.Controls.Add(this.rangeCheckbox);
       this.Controls.Add(this.fovUpDown);
       this.Controls.Add(this.linkLabel);

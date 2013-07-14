@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 using Dota2Booster.Properties;
 
 namespace Dota2Booster {
   public partial class Main : Form {
+    private readonly Overlay _overlay;
     private readonly ProcessMemory _processMemory = new ProcessMemory();
 
     private IntPtr _distanceAddress;
+    private IntPtr _dotaPlayerAddress;
+    private IntPtr _engineAddress;
     private IntPtr _fovAddress;
+    private IntPtr _heroAddress = IntPtr.Zero;
     private IntPtr _rangeAddress;
 
     internal Main() {
@@ -16,6 +21,9 @@ namespace Dota2Booster {
       distanceUpDown.Hide();
       fovUpDown.Hide();
       rangeCheckbox.Hide();
+
+      _overlay = new Overlay {TopMost = true};
+      _overlay.Show();
 
       searchTimer.Start();
     }
@@ -39,6 +47,19 @@ namespace Dota2Booster {
       statusLabel.Text = Resources.checking_player_status___;
 
       _processMemory.OpenProcess(processes[0]);
+
+      _dotaPlayerAddress = _processMemory.FindPattern(new byte[] {
+        0xA1, 0xFF, 0xFF, 0xFF, 0xFF, 0x83, 0xEC, 0x10, 0x53, 0x57
+      }, "x????xxxxx", _processMemory.GetModuleBaseAddress("client.dll"), 0xffffff);
+
+      _dotaPlayerAddress = _processMemory.ReadInt32Ptr(_dotaPlayerAddress + 1);
+
+      _engineAddress = _processMemory.FindPattern(new byte[] {
+        0xC1, 0xEB, 0x10, 0x81, 0xC2, 0xFF, 0xFF, 0xFF, 0xFF
+      }, "xxxxx????", _processMemory.GetModuleBaseAddress("client.dll"), 0xffffff);
+
+      _engineAddress = _processMemory.ReadInt32Ptr(_engineAddress + 5);
+
       IntPtr offsetAddress = _processMemory.FindPattern(new byte[] {
         0x8B, 0x0D, 0xFF, 0xFF, 0xFF, 0xFF, 0x8B, 0x40, 0x08, 0x66, 0x0F, 0xD6, 0x44, 0x24, 0xFF
       }, "xx????xxxxxxxx?", _processMemory.GetModuleBaseAddress("client.dll"), 0xffffff);
@@ -71,13 +92,21 @@ namespace Dota2Booster {
 
     private void CheckTimerTick(object sender, EventArgs e) {
       try {
-        _processMemory.ReadInt32Ptr(_distanceAddress);
+        if (_processMemory.ReadInt32Ptr(_dotaPlayerAddress) == IntPtr.Zero) {
+          return;
+        }
       }
       catch (ApplicationException) {
         checkTimer.Stop();
         searchTimer.Start();
         return;
       }
+
+
+      int index = _processMemory.ReadInt16(_processMemory.ReadInt32Ptr(_dotaPlayerAddress) + 0x19A4);
+      index = index*16;
+      _heroAddress = _processMemory.ReadInt32Ptr(_engineAddress + index);
+      _overlay.BackColor = _processMemory.ReadBytes(_heroAddress + 0x12E0, 1)[0] == 30 ? Color.Red : Color.Green;
 
       distanceUpDown.Value = _processMemory.ReadInt32(_distanceAddress);
       fovUpDown.Value = (decimal) _processMemory.ReadFloat(_fovAddress);
