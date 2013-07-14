@@ -4,6 +4,7 @@ dota2-booster
 * Change field of view
 * Change camera zoom
 * Enables dota_range_display
+* Overlay which is red when an enemy sees you even if invisible
 
 ## Usage
 
