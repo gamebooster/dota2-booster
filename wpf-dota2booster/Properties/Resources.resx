@@ -114,13 +114,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="checking_player_status___">
-    <value xml:space="preserve">Checking player status...</value>
-  </data>
-  <data name="searching_Dota2">
-    <value>Searching Dota 2...</value>
-  </data>
-  <data name="Waiting_for_game_world">
-    <value xml:space="preserve">Waiting for game world...</value>
-  </data>
 </root>

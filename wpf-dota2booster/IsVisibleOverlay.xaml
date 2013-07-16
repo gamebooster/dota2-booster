@@ -1,0 +1,10 @@
+﻿<Window x:Class="wpf_dota2booster.IsVisibleOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="IsVisibleOverlay" Height="75" Width="131" Topmost="True" AllowsTransparency="True" WindowStyle="None" MouseDown="Window_MouseDown" >
+    <Grid>
+       
+        
+     
+    </Grid>
+</Window>

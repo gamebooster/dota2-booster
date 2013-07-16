@@ -103,7 +103,22 @@ namespace Dota2Booster {
     }
 
     public string ReadString(IntPtr address, int size) {
+      byte[] raw = ReadBytes(address, size);
       return Encoding.UTF8.GetString(ReadBytes(address, size), 0, size);
+    }
+
+    public string ReadCString(IntPtr address) {
+      var list = new List<byte>();
+      var index = 0;
+      do {
+        var raw = ReadBytes(address + index * 32, 32);
+        for (var i = 0; i < 32; i++) {
+          if (raw[i] == '\0') return Encoding.UTF8.GetString(list.ToArray(), 0, list.Count);
+          list.Add(raw[i]);
+        }
+        index++;
+      } while (index < 8);
+      return Encoding.UTF8.GetString(list.ToArray(), 0, list.Count);
     }
 
     public string ReadWideString(IntPtr address, int size) {

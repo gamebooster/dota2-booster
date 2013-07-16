@@ -1,0 +1,8 @@
+﻿<Window x:Class="wpf_dota2booster.PlayersOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PlayersOverlay" Height="300" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True" ResizeMode="NoResize">
+    <Grid>
+        
+    </Grid>
+</Window>

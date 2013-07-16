@@ -1,0 +1,17 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="wpf_dota2booster.MainWindow"
+        Title="Dota 2 Booster" Height="217" Width="187" Closing="Window_Closing" WindowStyle="ToolWindow" Background="#FFFDFDFD">
+    <StackPanel>
+
+
+        <xctk:IntegerUpDown x:Name="distanceUpDown" Margin="10,10,5,0" VerticalAlignment="Top" Grid.ColumnSpan="2" ValueChanged="distanceUpDown_ValueChanged"/>
+        <xctk:IntegerUpDown x:Name="fovUpDown" Margin="10,10,5,0" VerticalAlignment="Top" ValueChanged="fovUpDown_ValueChanged_1"/>
+        <CheckBox x:Name="rangeCheckbox" Margin="10,10,5,0" VerticalAlignment="Top" Grid.ColumnSpan="2"  Content="dota__range__display" Click="rangeCheckbox_Click"/>
+        <Separator Height="2" Margin="0,10,0,0"/>
+        <xctk:IntegerUpDown x:Name="positionXLayoutUpDown" Margin="5,20,5,0" ValueChanged="positionXLayoutUpDown_ValueChanged"/>
+        <xctk:IntegerUpDown x:Name="positionYLayoutUpDown" Margin="5,10,5,0" ValueChanged="positionYLayoutUpDown_ValueChanged"/>
+
+    </StackPanel>
+</Window>
