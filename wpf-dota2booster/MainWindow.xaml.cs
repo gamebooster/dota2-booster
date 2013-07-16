@@ -1,10 +1,12 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Dota2Booster;
 using Xceed.Wpf.Toolkit;
@@ -65,6 +67,27 @@ namespace wpf_dota2booster
       if (_distanceAddress == IntPtr.Zero) return;
 
       _processMemory.WriteInt32(_distanceAddress, (int)distanceUpDown.Value);
+    }
+
+    private StackPanel GetItemControl(Dota2Classes.Item item)
+    {
+      var iconCanvas = new StackPanel { Orientation = Orientation.Horizontal };
+      var src = new BitmapImage();
+      src.BeginInit();
+      src.UriSource = new Uri("icons/" + item.ItemId + ".png", UriKind.Relative);
+      src.CacheOption = BitmapCacheOption.OnLoad;
+      src.EndInit();
+      Image icon = new Image
+      {
+        Source = src,
+        Width = 21.5,
+        Height = 16
+      };
+      if (item.Charges > 0)
+      iconCanvas.Children.Add(new Label { Content = item.Charges, Foreground = Brushes.White });
+
+      iconCanvas.Children.Add(icon);
+      return iconCanvas;
     }
 
     private void _searchTimer_Tick(object sender, EventArgs e)
@@ -133,11 +156,12 @@ namespace wpf_dota2booster
     }
 
     private void _checkTimer_Tick(object sender, EventArgs e) {
-      IntPtr playerResourceObject = IntPtr.Zero;
+      Dota2Classes.PlayerResources playerResourceObject;
       try {
         if (_processMemory.ReadInt32Ptr(_dotaPlayerAddress) == IntPtr.Zero) return;
-        playerResourceObject = _processMemory.ReadInt32Ptr(_playerResourceAddress);
-        if (playerResourceObject == IntPtr.Zero) return;
+        var playerResourcePtr = _processMemory.ReadInt32Ptr(_playerResourceAddress);
+        if (playerResourcePtr == IntPtr.Zero) return;
+        playerResourceObject = new Dota2Classes.PlayerResources(_processMemory, playerResourcePtr);
       }
       catch (ApplicationException) {
         _checkTimer.Stop();
@@ -145,73 +169,91 @@ namespace wpf_dota2booster
         return;
       }
 
-      int numHeroes = 0;
+      var numHeroes = 0;
       var container = new StackPanel { Margin = new Thickness(0)};
-      for (int i = 0; i < 32; i++)
-      {
-        IntPtr dotaPlayer = _processMemory.ReadInt32Ptr(_playersListAddress + 16 * i);
-        if (dotaPlayer != IntPtr.Zero)
-        {
-          int selectedUnits = _processMemory.ReadInt32(dotaPlayer + 0x1A78);
-          int playerId = _processMemory.ReadInt32(dotaPlayer + 0x1A14);
-          int index2 = _processMemory.ReadInt16(dotaPlayer + 0x19A4);
-          IntPtr hero = _processMemory.ReadInt32Ptr(_engineAddress + index2 * 16);
-          bool visible = _processMemory.ReadBytes(hero + 0x12E0, 1)[0] == 30;
-          float mana = _processMemory.ReadFloat(hero + 0x1134);
-          float maxMana = _processMemory.ReadFloat(hero + 0x1138);
-          float health = _processMemory.ReadInt32(hero + 0xfc);
-          float maxHealth = _processMemory.ReadInt32(hero + 0x110c);
-          int level = _processMemory.ReadInt32(hero + 0x10fc);
-          int damageMax = _processMemory.ReadInt32(hero + 0x12d8);
-          int gold = _processMemory.ReadInt32(playerResourceObject + 0x4c80 + 4 * playerId) + _processMemory.ReadInt32(playerResourceObject + 0x4d00 + 4 * playerId);
+      var playerList = new Dota2Classes.PlayerList(_processMemory, _playersListAddress);
+      var entityList = new Dota2Classes.EntityList(_processMemory, _engineAddress);
 
-          IntPtr playerName = _processMemory.ReadInt32Ptr(playerResourceObject + 0x5BC0 + 4 * playerId);
-          if (playerName == IntPtr.Zero) continue;
-          var semiTransparentControl = new Grid
-          {
-            Margin = new Thickness(0, 5, 0, 0),
-            Height = 40,
-            Width = 100,
-            Background = new SolidColorBrush(Color.FromArgb(100, 0, 0, 0))
-          };
+      for (var i = 0; i < 32; i++) {
+        var dotaPlayer = playerList.GetPlayerById(i);
+        if (dotaPlayer == null) continue;
 
-          semiTransparentControl.Children.Add(new Label
-          {
-            Content = string.Format("{0}", level),
-            Margin = new Thickness(0, 0, 0, 0),
-            Foreground = Brushes.White,
-          });
-          semiTransparentControl.Children.Add(new Label
-          {
-            Content = string.Format("{0}", _processMemory.ReadCString(playerName)),
-            Margin = new Thickness(25, 0, 0, 0),
-            Foreground = Brushes.White,
-          });
-          semiTransparentControl.Children.Add(new Label
-          {
-            Content = string.Format("{0:0}", mana),
-            Margin = new Thickness(30, 15, 0, 0),
-            Foreground = Brushes.LightBlue
-          });
-          semiTransparentControl.Children.Add(new Label
-          {
-            Content = string.Format("{0}", health),
-            Margin = new Thickness(0, 15, 0, 0),
-            Foreground = health < 500 ? Brushes.OrangeRed : Brushes.GreenYellow
+        var playerId = dotaPlayer.PlayerId;
+        var hero = entityList.GetHeroById(dotaPlayer.EntityId);
 
-          });
-          semiTransparentControl.Children.Add(new Label
-          {
-            Content = string.Format("{0}", gold),
-            Margin = new Thickness(60, 15, 0, 0),
-            Foreground = Brushes.Gold
-          });
-          container.Children.Add(semiTransparentControl);
-          numHeroes++;
+        float mana = hero.Mana;
+        float health = hero.Health;
+        int level = hero.Level;
+        int gold = playerResourceObject.GetGold(playerId);
+
+        if (playerResourceObject.IsValidPlayer(playerId) == false) continue;
+        Dota2Classes.Inventory inventory = hero.Inventory;
+        var items = new List<Dota2Classes.Item>();
+        for (var j = 0; j < 6; j++) {
+          var itemEntityId = inventory.GetItemIdByIndex(j);
+          if (itemEntityId <= 0) continue;
+          var item = entityList.GetItemById(itemEntityId);
+          if (item == null) continue;
+          items.Add(item);
         }
+
+        var semiTransparentControl = new Grid
+        {
+          Margin = new Thickness(0, 5, 0, 0),
+          Height = 60,
+          Width = 130,
+          Background = new SolidColorBrush(Color.FromArgb(100, 0, 0, 0))
+        };
+
+        semiTransparentControl.Children.Add(new Label {
+          Content = string.Format("{0}", level),
+          Margin = new Thickness(0, 0, 0, 0),
+          Foreground = Brushes.White,
+        });
+        semiTransparentControl.Children.Add(new Label {
+          Content = string.Format("{0}", playerResourceObject.GetPlayerName(playerId)),
+          Margin = new Thickness(25, 0, 0, 0),
+          Foreground = Brushes.White,
+        });
+        var stackImage = new StackPanel {
+          Margin = new Thickness(0,
+                                 30,
+                                 0,
+                                 0),
+          Orientation = Orientation.Horizontal,
+        };
+
+        foreach (Dota2Classes.Items itemType in Enum.GetValues(typeof (Dota2Classes.Items))) {
+          var item = items.Find(x => x.ItemId == itemType);
+          if (item != null) {
+            stackImage.Children.Add(GetItemControl(item));
+          }
+        }
+
+
+        semiTransparentControl.Children.Add(stackImage);
+
+        semiTransparentControl.Children.Add(new Label {
+          Content = string.Format("{0:0}", mana),
+          Margin = new Thickness(30, 15, 0, 0),
+          Foreground = Brushes.LightBlue
+        });
+        semiTransparentControl.Children.Add(new Label {
+          Content = string.Format("{0}", health),
+          Margin = new Thickness(0, 15, 0, 0),
+          Foreground = health < 500 ? Brushes.OrangeRed : Brushes.GreenYellow
+
+        });
+        semiTransparentControl.Children.Add(new Label {
+          Content = string.Format("{0}", gold),
+          Margin = new Thickness(60, 15, 0, 0),
+          Foreground = Brushes.Gold
+        });
+        container.Children.Add(semiTransparentControl);
+        numHeroes++;
       }
       _playersOverlay.Content = container;
-      _playersOverlay.Height = 100 + numHeroes * 35;
+      _playersOverlay.Height = 100 + numHeroes * 70;
       _playersOverlay.Width = 120;
 
       int index = _processMemory.ReadInt16(_processMemory.ReadInt32Ptr(_dotaPlayerAddress) + 0x19A4);
