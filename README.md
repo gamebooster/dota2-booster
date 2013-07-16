@@ -5,7 +5,7 @@ dota2-booster
 * Change camera zoom
 * Enables dota_range_display
 * Overlay which is red when an enemy sees you even if the enemy is invisible
-* Overlay with various player infos like mana health etc
+* Overlay with various player infos like mana health items etc
 
 ## Usage
 
